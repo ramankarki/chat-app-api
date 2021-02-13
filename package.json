@@ -1,0 +1,30 @@
+{
+  "name": "chat-app-api",
+  "version": "1.0.0",
+  "description": "This is a mern stack chat app, made real time with pusher",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ramankarki/chat-app-api.git"
+  },
+  "author": "Raman Karki",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ramankarki/chat-app-api/issues"
+  },
+  "homepage": "https://github.com/ramankarki/chat-app-api#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.11.12",
+    "morgan": "^1.10.0"
+  },
+  "engines": {
+    "node": "^14.15.5",
+    "npm": "^6.14.11"
+  }
+}
