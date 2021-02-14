@@ -53,7 +53,7 @@ const userSchema = new mongoose.Schema({
   },
   isUserActive: {
     type: Boolean,
-    default: true,
+    default: false,
   },
 });
 
@@ -75,17 +75,17 @@ userSchema.pre("save", async function (next) {
 userSchema.pre("save", function (next) {
   if (!this.isModified("password") || this.isNew) return next();
 
-  this.passwordChangedAt = Date.now() - 1000;
+  this.logs.passwordChangedAt = Date.now() - 1000;
 
   next();
 });
 
 // query middleware
-userSchema.pre(/^find/, function (next) {
-  this.find({ isAccountActive: true });
+// userSchema.pre(/^find/, function (next) {
+//   this.find({ isAccountActive: true });
 
-  next();
-});
+//   next();
+// });
 
 // instance method
 userSchema.methods.correctPassword = async function (
@@ -96,9 +96,9 @@ userSchema.methods.correctPassword = async function (
 };
 
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
-  if (this.passwordChangedAt) {
+  if (this.logs.passwordChangedAt) {
     const changedTimeStamp = parseInt(
-      this.passwordChangedAt.getTime() / 1000,
+      this.logs.passwordChangedAt.getTime() / 1000,
       10
     );
 
@@ -110,7 +110,7 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString("hex");
 
-  this.passwordResetToken = crypto
+  this.logs.passwordResetToken = crypto
     .createHash("sha256")
     .update(resetToken)
     .digest("hex");
@@ -118,10 +118,9 @@ userSchema.methods.createPasswordResetToken = function () {
   const date = new Date();
   let expiryTime = new Date(date.getTime() + 10 * 60 * 1000);
 
-  this.passwordResetExpires = expiryTime;
+  this.logs.passwordResetExpires = expiryTime;
 
   return resetToken;
 };
 
-const User = mongoose.model("users", userSchema);
-module.exports = User;
+module.exports = mongoose.model("users", userSchema);
