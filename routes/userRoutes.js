@@ -6,8 +6,8 @@ const userController = require("../controller/userController");
 router.post("/signup", auth.signup);
 router.get("/activateAccount/:token", auth.activateAccount);
 router.post("/resendActivationLink", auth.resendActivationLink);
-// router.post("/login", auth.login);
-// router.get("/logout", auth.logout);
+router.post("/login", auth.login);
+router.get("/logout", auth.logout);
 
 // router.post("/forgotPassword", auth.forgotPassword);
 // router.patch("/resetPassword/:token", auth.resetPassword);
