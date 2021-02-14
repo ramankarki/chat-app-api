@@ -9,7 +9,7 @@ router.post("/resendActivationLink", auth.resendActivationLink);
 router.post("/login", auth.login);
 router.get("/logout", auth.logout);
 
-// router.post("/forgotPassword", auth.forgotPassword);
+router.post("/forgotPassword", auth.forgotPassword);
 // router.patch("/resetPassword/:token", auth.resetPassword);
 
 // // all the routes under this route are protected

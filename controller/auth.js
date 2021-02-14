@@ -28,16 +28,24 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 
   const token = createToken(newUser, "1h");
+  try {
+    const url = `${req.protocol}://${req.get(
+      "host"
+    )}/user/activateAccount/${token}`;
+    await new Email(newUser, url).sendActivateAccount();
 
-  const url = `${req.protocol}://${req.get(
-    "host"
-  )}/user/activateAccount/${token}`;
-  await new Email(newUser, url).sendActivateAccount();
-
-  res.status(201).json({
-    status: "success",
-    message: "activate token has been sent in user email",
-  });
+    res.status(201).json({
+      status: "success",
+      message: "activate token has been sent in user email",
+    });
+  } catch (err) {
+    return next(
+      new AppError(
+        500,
+        "There was an error sending the email. Try again later!"
+      )
+    );
+  }
 });
 
 exports.activateAccount = catchAsync(async (req, res, next) => {
@@ -67,17 +75,26 @@ exports.resendActivationLink = catchAsync(async (req, res, next) => {
       new AppError(404, `user with email ${req.body.email} doesn't exists`)
     );
 
-  // send url with token in params in email
-  const token = createToken(user, "1h");
-  const url = `${req.protocol}://${req.get(
-    "host"
-  )}/user/activateAccount/${token}`;
-  await new Email(user, url).sendActivateAccount();
+  try {
+    // send url with token in params in email
+    const token = createToken(user, "1h");
+    const url = `${req.protocol}://${req.get(
+      "host"
+    )}/user/activateAccount/${token}`;
+    await new Email(user, url).sendActivateAccount();
 
-  res.status(200).json({
-    status: "success",
-    message: "activate token has been sent in user email",
-  });
+    res.status(200).json({
+      status: "success",
+      message: "activate token has been sent in user email",
+    });
+  } catch (err) {
+    return next(
+      new AppError(
+        500,
+        "There was an error sending the email. Try again later!"
+      )
+    );
+  }
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -115,3 +132,44 @@ exports.logout = (req, res) => {
   });
   res.status(200).json({ status: "success", message: "user is logged out" });
 };
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  // get user email
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user)
+    return next(
+      new AppError(
+        404,
+        `There is no user with ${req.body.email} email address.`
+      )
+    );
+
+  // generate the random reset token
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+
+  // send it to the user's email
+  try {
+    const resetURL = `${req.protocol}://${req.get(
+      "host"
+    )}/users/resetPassword/${resetToken}`;
+    await new Email(user, resetURL).sendResetPassword();
+
+    res.status(200).json({
+      status: "success",
+      message: "Token with url sent to email!",
+    });
+  } catch (err) {
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return next(
+      new AppError(
+        500,
+        "There was an error sending the email. Try again later!"
+      )
+    );
+  }
+});
