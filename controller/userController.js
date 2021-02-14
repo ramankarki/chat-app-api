@@ -45,3 +45,17 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
   sendToken(user, 200, req, res);
 });
+
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  await User.findByIdAndDelete(req.user.id);
+
+  res.cookie("jwt", "", {
+    expires: new Date(Date.now() + 2 * 1000),
+    httpOnly: true,
+  });
+
+  res.status(204).json({
+    status: "success",
+    message: "user has been successfully deleted !",
+  });
+});
