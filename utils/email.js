@@ -26,7 +26,7 @@ module.exports = class Email {
     const html = pug.renderFile(
       `${__dirname}/../views/emails/${template}.pug`,
       {
-        firstName: this.firstName,
+        username: this.username,
         url: this.url,
         subject,
       }
@@ -46,10 +46,13 @@ module.exports = class Email {
   }
 
   async sendActivateAccount() {
-    await this.send("activateAccount", "Activate your chat-app account");
+    await this.send("activateAccount", "Activate your chat app account");
   }
 
   async sendResetPassword() {
-    await this.send("passwordReset", "Reset password, only valid for 10 min");
+    await this.send(
+      "passwordReset",
+      "Reset your chat app account password, only valid for 10 min"
+    );
   }
 };
