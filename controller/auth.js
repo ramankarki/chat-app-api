@@ -209,3 +209,37 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // log the user in, send JWT
   sendToken(user, 200, req, res);
 });
+
+exports.protect = catchAsync(async (req, res, next) => {
+  let token;
+
+  // check token
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else {
+    token = req.cookies.jwt;
+  }
+
+  if (!token) return next(new AppError(401, "You are not logged in!"));
+
+  // verify token
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+
+  // check if user still exists
+  const existUser = await User.findById(decoded.id);
+  if (!existUser) {
+    return next(new AppError(401, "The user doesn't exist anymore!"));
+  }
+
+  // check if user changed password after the token was issued
+  if (existUser.changedPasswordAfter(decoded.iat)) {
+    return next(new AppError(401, "Password has been changed !"));
+  }
+
+  // access granted to next middleware
+  req.user = existUser;
+  next();
+});

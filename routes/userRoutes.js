@@ -12,10 +12,14 @@ router.get("/logout", auth.logout);
 router.post("/forgotPassword", auth.forgotPassword);
 router.patch("/resetPassword/:resetToken", auth.resetPassword);
 
-// // all the routes under this route are protected
-// router.use(auth.protect);
+// all the routes under this route are protected
+router.use(auth.protect);
 
-// router.patch("/updateMyPassword", auth.updatePassword);
+router.get("/", userController.getAllUsers);
+router.get("/:id", userController.getUser);
+router.get("/me", userController.getMe, userController.getUser);
+
+// router.patch("/updatePassword", auth.updatePassword);
 // router.patch(
 //   "/updateMe",
 //   userController.uploadUserPhoto,
@@ -23,10 +27,5 @@ router.patch("/resetPassword/:resetToken", auth.resetPassword);
 //   userController.updateMe
 // );
 // router.delete("/deleteMe", userController.deleteMe);
-
-// router
-//   .route("/")
-//   .get(userController.getAllUsers)
-//   .post(userController.createUser);
 
 module.exports = router;
