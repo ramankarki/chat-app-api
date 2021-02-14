@@ -1,4 +1,5 @@
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const app = express();
 
 const userRoutes = require("./routes/userRoutes");
@@ -11,6 +12,7 @@ if (process.env.NOD_ENV !== "production") {
 }
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api/v1/users", userRoutes);
 
