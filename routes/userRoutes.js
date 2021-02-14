@@ -17,9 +17,8 @@ router.use(auth.protect);
 
 router.get("/", userController.getAllUsers);
 router.get("/me", userController.getMe, userController.getUser);
-router.get("/:id", userController.getUser);
+router.patch("/updatePassword", userController.updatePassword);
 
-// router.patch("/updatePassword", auth.updatePassword);
 // router.patch(
 //   "/updateMe",
 //   userController.uploadUserPhoto,
@@ -27,5 +26,7 @@ router.get("/:id", userController.getUser);
 //   userController.updateMe
 // );
 // router.delete("/deleteMe", userController.deleteMe);
+
+router.get("/:id", userController.getUser);
 
 module.exports = router;
