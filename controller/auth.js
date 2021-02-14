@@ -145,6 +145,16 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       )
     );
 
+  // check if user account is not active
+  if (user && user.isAccountActive === false) {
+    return next(
+      new AppError(
+        404,
+        `User with email ${user.email} hasn't activated account`
+      )
+    );
+  }
+
   // generate the random reset token
   const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
@@ -158,11 +168,11 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
     res.status(200).json({
       status: "success",
-      message: "Token with url sent to email!",
+      message: "Reset password Token with url sent to email!",
     });
   } catch (err) {
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
+    user.logs.passwordResetToken = undefined;
+    user.logs.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false });
 
     return next(
@@ -172,4 +182,30 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       )
     );
   }
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  // get user based on the token
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.resetToken)
+    .digest("hex");
+
+  const user = await User.findOne({
+    "logs.passwordResetToken": hashedToken,
+    "logs.passwordResetExpires": { $gt: Date.now() },
+  });
+
+  // if token has not expired, and there is user, set the new password
+  if (!user) return next(new AppError(400, "Token is invalid or has expired"));
+
+  user.password = req.body.password;
+  user.confirmPassword = req.body.confirmPassword;
+  user.logs.passwordResetToken = undefined;
+  user.logs.passwordResetExpires = undefined;
+  await user.save();
+
+  // update changedPasswordAt property for the user
+  // log the user in, send JWT
+  sendToken(user, 200, req, res);
 });

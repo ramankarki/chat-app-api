@@ -10,7 +10,7 @@ router.post("/login", auth.login);
 router.get("/logout", auth.logout);
 
 router.post("/forgotPassword", auth.forgotPassword);
-// router.patch("/resetPassword/:token", auth.resetPassword);
+router.patch("/resetPassword/:resetToken", auth.resetPassword);
 
 // // all the routes under this route are protected
 // router.use(auth.protect);
