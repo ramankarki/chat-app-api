@@ -126,8 +126,8 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 exports.logout = (req, res) => {
-  res.cookie("jwt", "loggedout", {
-    expires: new Date(Date.now() + 10 * 1000),
+  res.cookie("jwt", "", {
+    expires: new Date(Date.now() + 2 * 1000),
     httpOnly: true,
   });
   res.status(200).json({ status: "success", message: "user is logged out" });
@@ -226,7 +226,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   if (!token) return next(new AppError(401, "You are not logged in!"));
 
   // verify token
-  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
   // check if user still exists
   const existUser = await User.findById(decoded.id);
