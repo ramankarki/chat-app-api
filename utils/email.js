@@ -46,7 +46,10 @@ module.exports = class Email {
   }
 
   async sendActivateAccount() {
-    await this.send("activateAccount", "Activate your chat app account");
+    await this.send(
+      "activateAccount",
+      "Activate your chat app account, only valid for 1h"
+    );
   }
 
   async sendResetPassword() {
