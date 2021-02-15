@@ -27,11 +27,11 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
 
   req.file.filename = `users__${req.user.id}.jpeg`;
 
-  await sharp(req.file.buffer)
+  req.file = await sharp(req.file.buffer)
     .resize(300, 300)
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
-    .toFile("public/img/users/" + req.file.filename);
+    .toBuffer();
 
   next();
 });
@@ -45,7 +45,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
       )
     );
 
-  if (req.file) req.body.avatar = req.file.filename;
+  if (req.file) req.body.avatar = req.file;
 
   const updatedUser = await User.findByIdAndUpdate(req.user.id, req.body, {
     new: true,
