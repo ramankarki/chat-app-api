@@ -228,8 +228,18 @@ exports.protect = catchAsync(async (req, res, next) => {
   // verify token
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-  // check if user still exists
   const existUser = await User.findById(decoded.id);
+
+  // check if user has activated account
+  if (existUser.isAccountActive === false)
+    return next(
+      new AppError(
+        401,
+        "user has not activated account and can't request for any routes"
+      )
+    );
+
+  // check if user still exists
   if (!existUser) {
     return next(new AppError(401, "The user doesn't exist anymore!"));
   }
