@@ -13,7 +13,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   if (user && user.isAccountActive === false) {
     return next(
       new AppError(
-        404,
+        400,
         `User with email ${user.email} already exists but hasn't activated account`
       )
     );
@@ -65,14 +65,14 @@ exports.activateAccount = catchAsync(async (req, res, next) => {
 exports.resendActivationLink = catchAsync(async (req, res, next) => {
   // check if email entered
   if (!req.body.email)
-    return next(new AppError(404, "please enter your email"));
+    return next(new AppError(400, "please enter your email"));
 
   const user = await User.findOne({ email: req.body.email });
 
   // check if user exist with that email
   if (!user)
     return next(
-      new AppError(404, `user with email ${req.body.email} doesn't exists`)
+      new AppError(400, `user with email ${req.body.email} doesn't exists`)
     );
 
   try {
@@ -111,7 +111,7 @@ exports.login = catchAsync(async (req, res, next) => {
   if (user && user.isAccountActive === false) {
     return next(
       new AppError(
-        404,
+        400,
         `User with email ${user.email} hasn't activated account`
       )
     );
@@ -140,7 +140,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   if (!user)
     return next(
       new AppError(
-        404,
+        400,
         `There is no user with ${req.body.email} email address.`
       )
     );
@@ -149,7 +149,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   if (user && user.isAccountActive === false) {
     return next(
       new AppError(
-        404,
+        400,
         `User with email ${user.email} hasn't activated account`
       )
     );
