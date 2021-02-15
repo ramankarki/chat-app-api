@@ -39,10 +39,7 @@ const userSchema = new mongoose.Schema({
     passwordResetToken: String,
     passwordResetExpires: Date,
   },
-  avatar: {
-    type: String,
-    default: "avatar.svg",
-  },
+  avatar: Buffer,
   isAccountActive: {
     type: Boolean,
     default: false,
