@@ -3,56 +3,62 @@ const validator = require("validator");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 
-const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: [true, "Username is required"],
-    trim: true,
-  },
-  email: {
-    type: String,
-    unique: true,
-    lowercase: true,
-    required: [true, "Email is required"],
-    validate: [validator.isEmail, "Email should be valid"],
-  },
-  password: {
-    type: String,
-    required: [true, "Password is required"],
-    minlength: 12,
-    select: false,
-  },
-  confirmPassword: {
-    type: String,
-    required: [true, "Confirm Password is required"],
-    validate: {
-      // this only works on .save, .create
-      validator: function (el) {
-        return this.password === el;
+const userSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: [true, "Username is required"],
+      trim: true,
+    },
+    email: {
+      type: String,
+      unique: true,
+      lowercase: true,
+      required: [true, "Email is required"],
+      validate: [validator.isEmail, "Email should be valid"],
+    },
+    password: {
+      type: String,
+      required: [true, "Password is required"],
+      minlength: 12,
+      select: false,
+    },
+    confirmPassword: {
+      type: String,
+      required: [true, "Confirm Password is required"],
+      validate: {
+        // this only works on .save, .create
+        validator: function (el) {
+          return this.password === el;
+        },
+        message: "Passwords are not the same.",
       },
-      message: "Passwords are not the same.",
+    },
+    logs: {
+      lastLogin: Date,
+      passwordChangedAt: Date,
+      passwordResetToken: String,
+      passwordResetExpires: Date,
+    },
+    avatar: Buffer,
+    isAccountActive: {
+      type: Boolean,
+      default: false,
+    },
+    joinedAt: {
+      type: Date,
+      default: Date.now(),
+    },
+    isUserActive: {
+      type: Boolean,
+      default: false,
     },
   },
-  logs: {
-    lastLogin: Date,
-    passwordChangedAt: Date,
-    passwordResetToken: String,
-    passwordResetExpires: Date,
-  },
-  avatar: Buffer,
-  isAccountActive: {
-    type: Boolean,
-    default: false,
-  },
-  joinedAt: {
-    type: Date,
-    default: Date.now(),
-  },
-  isUserActive: {
-    type: Boolean,
-    default: false,
-  },
-});
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
+);
 
 // document middleware
 userSchema.pre("save", async function (next) {
