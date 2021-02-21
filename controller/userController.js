@@ -2,6 +2,8 @@ const multer = require("multer");
 const sharp = require("sharp");
 
 const User = require("../model/User");
+const Conversation = require("../model/Conversation");
+const Message = require("../model/Message");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/AppError");
 const { sendToken } = require("../utils/sendToken");
@@ -59,9 +61,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const filter =
-    process.env.NODE_ENV === "production" ? { isAccountActive: true } : {};
-  const users = await User.find(filter);
+  const users = await User.find({ isAccountActive: true });
 
   res.status(200).json({
     status: "success",
@@ -102,6 +102,10 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
+  await Message.deleteMany({ user: req.user.id });
+  await Conversation.deleteMany({ user1: req.user.id });
+  await Conversation.deleteMany({ user2: req.user.id });
+
   await User.findByIdAndDelete(req.user.id);
 
   res.cookie("jwt", "", {
