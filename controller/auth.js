@@ -7,7 +7,7 @@ const AppError = require("./../utils/AppError");
 const Email = require("../utils/email");
 const { sendToken, createToken } = require("../utils/sendToken");
 
-const baseURL = "http://localhost:3000";
+const baseURL = "https://raman-chatapp.netlify.app";
 
 exports.signup = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
