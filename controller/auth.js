@@ -7,6 +7,8 @@ const AppError = require("./../utils/AppError");
 const Email = require("../utils/email");
 const { sendToken, createToken } = require("../utils/sendToken");
 
+const baseURL = "http://localhost:3000";
+
 exports.signup = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
 
@@ -23,15 +25,13 @@ exports.signup = catchAsync(async (req, res, next) => {
     username: req.body.username,
     email: req.body.email,
     password: req.body.password,
-    confirmPassword: req.body.password,
+    confirmPassword: req.body.confirmPassword,
     avatar: req.body.avatar,
   });
 
   const token = createToken(newUser, "1h");
   try {
-    const url = `${req.protocol}://${req.get(
-      "host"
-    )}/user/activateAccount/${token}`;
+    const url = `/#/users/activateAccount/${token}`;
     await new Email(newUser, url).sendActivateAccount();
 
     res.status(201).json({
@@ -78,9 +78,7 @@ exports.resendActivationLink = catchAsync(async (req, res, next) => {
   try {
     // send url with token in params in email
     const token = createToken(user, "1h");
-    const url = `${req.protocol}://${req.get(
-      "host"
-    )}/user/activateAccount/${token}`;
+    const url = `${baseURL}/#/users/activateAccount/${token}`;
     await new Email(user, url).sendActivateAccount();
 
     res.status(200).json({
@@ -161,9 +159,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   // send it to the user's email
   try {
-    const resetURL = `${req.protocol}://${req.get(
-      "host"
-    )}/users/resetPassword/${resetToken}`;
+    const resetURL = `${baseURL}/#/users/resetpassword/${resetToken}`;
     await new Email(user, resetURL).sendResetPassword();
 
     res.status(200).json({
