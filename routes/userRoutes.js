@@ -12,8 +12,6 @@ router.get("/logout", auth.logout);
 router.post("/forgotPassword", auth.forgotPassword);
 router.patch("/resetPassword/:resetToken", auth.resetPassword);
 
-router.post("/updateMe", userController.updateOnlineState);
-
 // all the routes under this route are protected
 router.use(auth.protect);
 
