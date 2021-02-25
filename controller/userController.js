@@ -120,8 +120,10 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
 });
 
 exports.updateOnlineState = catchAsync(async (req, res, next) => {
+  const decoded = jwt.verify(req.body.token, process.env.JWT_SECRET);
+
   await User.findByIdAndUpdate(
-    req.user.id,
+    decoded.id,
     { isUserActive: req.body.isUserActive },
     {
       new: true,
