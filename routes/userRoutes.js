@@ -12,6 +12,8 @@ router.get("/logout", auth.logout);
 router.post("/forgotPassword", auth.forgotPassword);
 router.patch("/resetPassword/:resetToken", auth.resetPassword);
 
+router.post("/updateMe", userController.updateOnlineState);
+
 // all the routes under this route are protected
 router.use(auth.protect);
 
@@ -19,14 +21,12 @@ router.get("/", userController.getAllUsers);
 router.get("/me", userController.getMe, userController.getUser);
 router.patch("/updatePassword", userController.updatePassword);
 
-router
-  .route("/updateMe")
-  .patch(
-    userController.uploadUserPhoto,
-    userController.resizeUserPhoto,
-    userController.updateMe
-  )
-  .post(userController.updateOnlineState);
+router.patch(
+  "/updateMe",
+  userController.uploadUserPhoto,
+  userController.resizeUserPhoto,
+  userController.updateMe
+);
 
 router.delete("/deleteMe", userController.deleteMe);
 
