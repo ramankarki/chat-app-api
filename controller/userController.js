@@ -118,3 +118,18 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     message: "user has been successfully deleted !",
   });
 });
+
+exports.updateOnlineState = catchAsync(async (req, res, next) => {
+  await User.findByIdAndUpdate(
+    req.user.id,
+    { isUserActive: req.body.isUserActive },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  res.status(200).json({
+    status: "success",
+  });
+});

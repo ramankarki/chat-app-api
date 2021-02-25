@@ -19,12 +19,15 @@ router.get("/", userController.getAllUsers);
 router.get("/me", userController.getMe, userController.getUser);
 router.patch("/updatePassword", userController.updatePassword);
 
-router.patch(
-  "/updateMe",
-  userController.uploadUserPhoto,
-  userController.resizeUserPhoto,
-  userController.updateMe
-);
+router
+  .route("/updateMe")
+  .patch(
+    userController.uploadUserPhoto,
+    userController.resizeUserPhoto,
+    userController.updateMe
+  )
+  .post(userController.updateOnlineState);
+
 router.delete("/deleteMe", userController.deleteMe);
 
 router.get("/:id", userController.getUser);
