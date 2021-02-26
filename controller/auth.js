@@ -7,7 +7,12 @@ const AppError = require("./../utils/AppError");
 const Email = require("../utils/email");
 const { sendToken, createToken } = require("../utils/sendToken");
 
-const baseURL = "https://raman-chatapp.netlify.app";
+let baseURL;
+if (process.env.NODE_ENV === "production") {
+  baseURL = "https://raman-chatapp.netlify.app";
+} else {
+  baseURL = "http://localhost:3000";
+}
 
 exports.signup = catchAsync(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
@@ -31,7 +36,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   const token = createToken(newUser, "1h");
   try {
-    const url = `/#/users/activateAccount/${token}`;
+    const url = `${baseURL}/#/users/activateAccount/${token}`;
     await new Email(newUser, url).sendActivateAccount();
 
     res.status(201).json({
